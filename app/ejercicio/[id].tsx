@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Image } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -43,11 +43,20 @@ export default function EjercicioDetalleScreen() {
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <Stack.Screen options={{ title: ejercicio.nombre }} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <View style={styles.tarjetaImagenPlaceholder}>
-          <Ionicons name="barbell-outline" size={60} color={COLORES_APP.primario} />
-          <Text style={styles.textoPlaceholder}>Ilustración Técnica</Text>
-          <Text style={styles.idBadge}>ID: {ejercicio.id}</Text>
-        </View>
+        {ejercicio.imagen ? (
+          <View style={styles.tarjetaImagenContenedor}>
+            <Image source={ejercicio.imagen} style={styles.imagenEjercicio} resizeMode="cover" />
+            <View style={styles.idBadgeFlotante}>
+              <Text style={styles.idBadgeTexto}>ID: {ejercicio.id}</Text>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.tarjetaImagenPlaceholder}>
+            <Ionicons name="barbell-outline" size={60} color={COLORES_APP.primario} />
+            <Text style={styles.textoPlaceholder}>Ilustración Técnica</Text>
+            <Text style={styles.idBadge}>ID: {ejercicio.id}</Text>
+          </View>
+        )}
 
         <View style={styles.tarjetaInfo}>
           <Text style={styles.nombreEjercicio}>{ejercicio.nombre}</Text>
@@ -111,6 +120,36 @@ export default function EjercicioDetalleScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORES_APP.fondo },
   scrollContent: { padding: 16, paddingBottom: 24 },
+  tarjetaImagenContenedor: {
+    backgroundColor: COLORES_APP.superficie,
+    borderRadius: 16,
+    height: 190,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: COLORES_APP.borde,
+    marginBottom: 14,
+    position: 'relative',
+  },
+  imagenEjercicio: {
+    width: '100%',
+    height: '100%',
+  },
+  idBadgeFlotante: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    backgroundColor: 'rgba(15, 23, 42, 0.85)',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: COLORES_APP.borde,
+  },
+  idBadgeTexto: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORES_APP.primario,
+  },
   tarjetaImagenPlaceholder: {
     backgroundColor: COLORES_APP.superficie, borderRadius: 16, height: 160,
     alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORES_APP.borde, marginBottom: 14,

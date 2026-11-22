@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import type { Ejercicio } from '@/types/gym';
 import { COLORES_APP } from '@/constants/colores';
@@ -36,6 +36,10 @@ export function ItemEjercicio({
             <Ionicons name="checkmark" size={18} color="#0F172A" />
           )}
         </View>
+
+        {ejercicio.imagen ? (
+          <Image source={ejercicio.imagen} style={styles.miniatura} resizeMode="cover" />
+        ) : null}
 
         <View style={styles.info}>
           <Text
@@ -115,6 +119,13 @@ const styles = StyleSheet.create({
   checkboxMarcado: {
     backgroundColor: COLORES_APP.exito,
     borderColor: COLORES_APP.exito,
+  },
+  miniatura: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    marginRight: 10,
+    backgroundColor: COLORES_APP.superficieClara,
   },
   info: {
     flex: 1,

@@ -1,3 +1,5 @@
+import type { ImageSourcePropType } from 'react-native';
+
 export type DiaSemana =
   | 'lunes'
   | 'martes'
@@ -25,7 +27,7 @@ export interface Ejercicio {
   grupo: GrupoMuscular;
   series: number; // 4
   repeticiones: number; // 12
-  imagen?: number; // require('@/assets/images/ejercicios/pec-01.png')
+  imagen?: ImageSourcePropType;
 }
 
 export interface DiaPlan {

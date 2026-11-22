@@ -8,6 +8,7 @@ import {
   Pressable,
   useWindowDimensions,
   DimensionValue,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -83,6 +84,9 @@ export default function CatalogoScreen() {
                     onPress={() =>
                       router.push({ pathname: '/ejercicio/[id]', params: { id: item.id } })
                     }>
+                    {item.imagen && (
+                      <Image source={item.imagen} style={styles.miniaturaResultado} resizeMode="cover" />
+                    )}
                     <View style={styles.infoResultado}>
                       <Text style={styles.nombreResultado}>{item.nombre}</Text>
                       <Text style={styles.grupoResultado}>
@@ -173,6 +177,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORES_APP.borde,
     minHeight: 56,
+  },
+  miniaturaResultado: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    marginRight: 12,
+    backgroundColor: COLORES_APP.superficieClara,
   },
   infoResultado: { flex: 1 },
   nombreResultado: { fontSize: 16, fontWeight: '600', color: COLORES_APP.texto, marginBottom: 2 },

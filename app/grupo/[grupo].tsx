@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Pressable, Image } from 'react-native';
 import { useLocalSearchParams, useRouter, Stack } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -69,6 +69,9 @@ export default function GrupoMuscularScreen() {
               }
               accessibilityRole="button"
               accessibilityLabel={`Ver detalle de ${item.nombre}`}>
+              {item.imagen && (
+                <Image source={item.imagen} style={styles.miniatura} resizeMode="cover" />
+              )}
               <View style={styles.infoEjercicio}>
                 <Text style={styles.nombreEjercicio}>{item.nombre}</Text>
                 <Text style={styles.metaEjercicio}>
@@ -97,6 +100,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORES_APP.superficie, borderRadius: 12, padding: 14,
     borderWidth: 1, borderColor: COLORES_APP.borde, flexDirection: 'row',
     alignItems: 'center', justifyContent: 'space-between', minHeight: 54,
+  },
+  miniatura: {
+    width: 48,
+    height: 48,
+    borderRadius: 8,
+    marginRight: 12,
+    backgroundColor: COLORES_APP.superficieClara,
   },
   infoEjercicio: { flex: 1 },
   nombreEjercicio: { fontSize: 16, fontWeight: '600', color: COLORES_APP.texto, marginBottom: 2 },
