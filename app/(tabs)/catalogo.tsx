@@ -14,22 +14,8 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ejercicios } from '@/data/ejercicios';
 import { normalizar } from '@/utils/texto';
+import { GRUPOS_MUSCULARES } from '@/constants/grupos';
 import { COLORES_APP } from '@/constants/colores';
-import type { GrupoMuscular } from '@/types/gym';
-
-const GRUPOS_MUSCULARES: { clave: GrupoMuscular; nombre: string; icono: keyof typeof Ionicons.glyphMap }[] = [
-  { clave: 'pierna', nombre: 'Pierna', icono: 'walk-outline' },
-  { clave: 'pecho', nombre: 'Pecho', icono: 'shield-outline' },
-  { clave: 'triceps', nombre: 'Tríceps', icono: 'barbell-outline' },
-  { clave: 'espalda', nombre: 'Espalda', icono: 'body-outline' },
-  { clave: 'hombro', nombre: 'Hombro', icono: 'fitness-outline' },
-  { clave: 'biceps', nombre: 'Bíceps', icono: 'hand-left-outline' },
-  { clave: 'abdomen', nombre: 'Abdomen', icono: 'disc-outline' },
-  { clave: 'cadera', nombre: 'Cadera', icono: 'radio-button-on-outline' },
-  { clave: 'gluteo', nombre: 'Glúteo', icono: 'flame-outline' },
-  { clave: 'lumbar', nombre: 'Lumbar', icono: 'pulse-outline' },
-  { clave: 'antebrazo', nombre: 'Antebrazo', icono: 'hand-right-outline' },
-];
 
 export default function CatalogoScreen() {
   const router = useRouter();
@@ -37,7 +23,7 @@ export default function CatalogoScreen() {
   const [busqueda, setBusqueda] = useState('');
 
   const numColumnas = width > 600 ? 3 : 2;
-  const anchoTarjeta = `${Math.floor(100 / numColumnas) - 2}%`;
+  const anchoTarjeta = `${Math.floor(100 / numColumnas) - 2}%` as DimensionValue;
 
   const ejerciciosFiltrados = useMemo(() => {
     if (!busqueda.trim()) return [];
@@ -81,14 +67,12 @@ export default function CatalogoScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {busqueda.trim().length > 0 ? (
             <View>
-              <Text style={styles.tituloResultados}>
-                Resultados ({ejerciciosFiltrados.length})
-              </Text>
+              <Text style={styles.tituloResultados}>Resultados ({ejerciciosFiltrados.length})</Text>
               {ejerciciosFiltrados.length === 0 ? (
                 <View style={styles.sinResultados}>
                   <Ionicons name="alert-circle-outline" size={48} color={COLORES_APP.textoSecundario} />
                   <Text style={styles.sinResultadosTexto}>
-                    No se encontraron ejercicios con "{busqueda}"
+                    {`No se encontraron ejercicios con "${busqueda}"`}
                   </Text>
                 </View>
               ) : (
@@ -97,10 +81,7 @@ export default function CatalogoScreen() {
                     key={item.id}
                     style={styles.itemResultado}
                     onPress={() =>
-                      router.push({
-                        pathname: '/ejercicio/[id]',
-                        params: { id: item.id },
-                      })
+                      router.push({ pathname: '/ejercicio/[id]', params: { id: item.id } })
                     }>
                     <View style={styles.infoResultado}>
                       <Text style={styles.nombreResultado}>{item.nombre}</Text>
@@ -120,7 +101,7 @@ export default function CatalogoScreen() {
                 {GRUPOS_MUSCULARES.map(grupo => (
                   <Pressable
                     key={grupo.clave}
-                    style={[styles.tarjetaGrupo, { width: anchoTarjeta as DimensionValue }]}
+                    style={[styles.tarjetaGrupo, { width: anchoTarjeta }]}
                     onPress={() => router.push(`/grupo/${grupo.clave}`)}>
                     <View style={styles.iconoContenedor}>
                       <Ionicons name={grupo.icono} size={26} color={COLORES_APP.primario} />

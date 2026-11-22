@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { ejercicios } from '@/data/ejercicios';
 import { planSemanal } from '@/data/plan';
 import { useGym } from '@/context/GymContext';
+import { AlertaLesion } from '@/components/AlertaLesion';
 import { COLORES_APP } from '@/constants/colores';
 
 export default function EjercicioDetalleScreen() {
@@ -25,13 +26,10 @@ export default function EjercicioDetalleScreen() {
       <SafeAreaView style={styles.contenedorError} edges={['bottom']}>
         <Ionicons name="alert-circle-outline" size={56} color={COLORES_APP.peligro} />
         <Text style={styles.tituloError}>Ejercicio no encontrado</Text>
-        <Text style={styles.textoError}>
-          El código de ejercicio no existe en el catálogo digital.
-        </Text>
+        <Text style={styles.textoError}>El ejercicio no existe en el catálogo.</Text>
         <Pressable
           style={styles.botonVolver}
-          onPress={() => router.replace('/catalogo')}
-          accessibilityRole="button">
+          onPress={() => router.replace('/catalogo')}>
           <Text style={styles.textoBotonVolver}>Volver al Catálogo</Text>
         </Pressable>
       </SafeAreaView>
@@ -44,11 +42,9 @@ export default function EjercicioDetalleScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <Stack.Screen options={{ title: ejercicio.nombre }} />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.tarjetaImagenPlaceholder}>
-          <Ionicons name="barbell-outline" size={64} color={COLORES_APP.primario} />
+          <Ionicons name="barbell-outline" size={60} color={COLORES_APP.primario} />
           <Text style={styles.textoPlaceholder}>Ilustración Técnica</Text>
           <Text style={styles.idBadge}>ID: {ejercicio.id}</Text>
         </View>
@@ -77,30 +73,15 @@ export default function EjercicioDetalleScreen() {
           </View>
         </View>
 
-        {tieneLesion && (
-          <View style={styles.alertaLesion}>
-            <Ionicons name="warning" size={24} color={COLORES_APP.advertencia} />
-            <View style={styles.alertaContenido}>
-              <Text style={styles.alertaTitulo}>Advertencia de Salud</Text>
-              <Text style={styles.alertaTexto}>
-                Tienes registrada una lesión que afecta al grupo muscular "{nombreGrupo}".
-                Realiza el movimiento con peso moderado y deténte si sientes molestia.
-              </Text>
-            </View>
-          </View>
-        )}
+        {tieneLesion && <AlertaLesion grupo={ejercicio.grupo} />}
 
         <View style={styles.seccionDias}>
           <Text style={styles.tituloDias}>Días asignados en tu plan semanal</Text>
           {diasAsignados.length === 0 ? (
             <View style={styles.sinDias}>
-              <Ionicons
-                name="information-circle-outline"
-                size={22}
-                color={COLORES_APP.textoSecundario}
-              />
+              <Ionicons name="information-circle-outline" size={20} color={COLORES_APP.textoSecundario} />
               <Text style={styles.sinDiasTexto}>
-                Este ejercicio no está asignado a ningún día de tu plan actual.
+                No está asignado en tu plan actual.
               </Text>
             </View>
           ) : (
@@ -117,11 +98,7 @@ export default function EjercicioDetalleScreen() {
                     {plan.enfoque}
                   </Text>
                 </View>
-                <Ionicons
-                  name="chevron-forward"
-                  size={20}
-                  color={COLORES_APP.textoSecundario}
-                />
+                <Ionicons name="chevron-forward" size={20} color={COLORES_APP.textoSecundario} />
               </Pressable>
             ))
           )}
@@ -135,109 +112,37 @@ const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORES_APP.fondo },
   scrollContent: { padding: 16, paddingBottom: 24 },
   tarjetaImagenPlaceholder: {
-    backgroundColor: COLORES_APP.superficie,
-    borderRadius: 16,
-    height: 180,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: COLORES_APP.borde,
-    marginBottom: 16,
+    backgroundColor: COLORES_APP.superficie, borderRadius: 16, height: 160,
+    alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: COLORES_APP.borde, marginBottom: 14,
   },
-  textoPlaceholder: { fontSize: 14, color: COLORES_APP.textoSecundario, marginTop: 8 },
+  textoPlaceholder: { fontSize: 14, color: COLORES_APP.textoSecundario, marginTop: 6 },
   idBadge: {
-    marginTop: 6,
-    fontSize: 12,
-    color: COLORES_APP.primario,
-    backgroundColor: COLORES_APP.superficieClara,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    fontFamily: 'monospace',
+    marginTop: 4, fontSize: 12, color: COLORES_APP.primario,
+    backgroundColor: COLORES_APP.superficieClara, paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6,
   },
-  tarjetaInfo: {
-    backgroundColor: COLORES_APP.superficie,
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 14,
-  },
-  nombreEjercicio: { fontSize: 22, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 8 },
-  badgeGrupo: {
-    backgroundColor: COLORES_APP.superficieClara,
-    alignSelf: 'flex-start',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  textoGrupo: { color: COLORES_APP.primario, fontWeight: '600', fontSize: 14 },
-  filaMetricas: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    borderTopWidth: 1,
-    borderTopColor: COLORES_APP.borde,
-    paddingTop: 14,
-  },
+  tarjetaInfo: { backgroundColor: COLORES_APP.superficie, borderRadius: 14, padding: 16, marginBottom: 12 },
+  nombreEjercicio: { fontSize: 20, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 6 },
+  badgeGrupo: { backgroundColor: COLORES_APP.superficieClara, alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6, marginBottom: 12 },
+  textoGrupo: { color: COLORES_APP.primario, fontWeight: '600', fontSize: 13 },
+  filaMetricas: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-around', borderTopWidth: 1, borderTopColor: COLORES_APP.borde, paddingTop: 12 },
   cajaMetrica: { alignItems: 'center' },
   valorMetrica: { fontSize: 20, fontWeight: 'bold', color: COLORES_APP.texto },
-  etiquetaMetrica: { fontSize: 13, color: COLORES_APP.textoSecundario, marginTop: 2 },
-  separadorMetrica: { width: 1, height: 32, backgroundColor: COLORES_APP.borde },
-  alertaLesion: {
-    backgroundColor: COLORES_APP.advertenciaFondo,
-    borderColor: COLORES_APP.advertenciaBorde,
-    borderWidth: 1.5,
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 14,
-    flexDirection: 'row',
-    gap: 12,
-  },
-  alertaContenido: { flex: 1 },
-  alertaTitulo: { fontSize: 15, fontWeight: 'bold', color: COLORES_APP.advertencia, marginBottom: 2 },
-  alertaTexto: { fontSize: 13, color: COLORES_APP.texto, lineHeight: 18 },
-  seccionDias: { marginTop: 6 },
-  tituloDias: { fontSize: 16, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 10 },
-  sinDias: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: COLORES_APP.superficie,
-    padding: 14,
-    borderRadius: 10,
-  },
+  etiquetaMetrica: { fontSize: 12, color: COLORES_APP.textoSecundario, marginTop: 2 },
+  separadorMetrica: { width: 1, height: 28, backgroundColor: COLORES_APP.borde },
+  seccionDias: { marginTop: 4 },
+  tituloDias: { fontSize: 16, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 8 },
+  sinDias: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: COLORES_APP.superficie, padding: 12, borderRadius: 10 },
   sinDiasTexto: { fontSize: 14, color: COLORES_APP.textoSecundario, flex: 1 },
   tarjetaDiaAsignado: {
-    backgroundColor: COLORES_APP.superficie,
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 8,
-    borderLeftWidth: 4,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: 52,
+    backgroundColor: COLORES_APP.superficie, borderRadius: 10, padding: 12, marginBottom: 8,
+    borderLeftWidth: 4, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 48,
   },
   infoDiaAsignado: { flex: 1 },
-  nombreDiaAsignado: { fontSize: 16, fontWeight: 'bold', color: COLORES_APP.texto },
+  nombreDiaAsignado: { fontSize: 15, fontWeight: 'bold', color: COLORES_APP.texto },
   enfoqueDiaAsignado: { fontSize: 13, fontWeight: '500', marginTop: 2 },
-  contenedorError: {
-    flex: 1,
-    backgroundColor: COLORES_APP.fondo,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
+  contenedorError: { flex: 1, backgroundColor: COLORES_APP.fondo, alignItems: 'center', justifyContent: 'center', padding: 24 },
   tituloError: { fontSize: 22, fontWeight: 'bold', color: COLORES_APP.texto, marginTop: 12 },
   textoError: { fontSize: 15, color: COLORES_APP.textoSecundario, textAlign: 'center', marginVertical: 10 },
-  botonVolver: {
-    marginTop: 16,
-    backgroundColor: COLORES_APP.primario,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
+  botonVolver: { marginTop: 16, backgroundColor: COLORES_APP.primario, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8, minHeight: 44, justifyContent: 'center' },
   textoBotonVolver: { color: '#0F172A', fontWeight: 'bold', fontSize: 15 },
 });

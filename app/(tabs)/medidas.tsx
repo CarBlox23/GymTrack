@@ -14,19 +14,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useGym } from '@/context/GymContext';
 import { CampoFormulario } from '@/components/CampoFormulario';
 import { TarjetaResumenImc } from '@/components/TarjetaResumenImc';
+import { ItemHistorialMedida } from '@/components/ItemHistorialMedida';
+import { PERIMETROS_DEF } from '@/constants/perimetros';
 import { COLORES_APP } from '@/constants/colores';
 import type { Medida, PerimetroClave } from '@/types/gym';
-
-const PERIMETROS_DEF: { clave: PerimetroClave; etiqueta: string }[] = [
-  { clave: 'hombro', etiqueta: 'Hombro' },
-  { clave: 'brazo', etiqueta: 'Brazo' },
-  { clave: 'antebrazo', etiqueta: 'Antebrazo' },
-  { clave: 'pecho', etiqueta: 'Pecho' },
-  { clave: 'abdomen', etiqueta: 'Abdomen' },
-  { clave: 'cadera', etiqueta: 'Cadera' },
-  { clave: 'pierna', etiqueta: 'Pierna' },
-  { clave: 'pantorrilla', etiqueta: 'Pantorrilla' },
-];
 
 export default function MedidasScreen() {
   const { medidas, agregarMedida, socio } = useGym();
@@ -142,19 +133,7 @@ export default function MedidasScreen() {
 
           <Text style={styles.tituloHistorial}>Historial de Registros ({historialOrdenado.length})</Text>
           {historialOrdenado.map(item => (
-            <View key={item.mes} style={styles.itemHistorial}>
-              <View style={styles.encabezadoHistorial}>
-                <Text style={styles.mesHistorial}>{item.mes}</Text>
-                <Text style={styles.pesoHistorial}>{item.pesoKg} kg • {item.estaturaM} m</Text>
-              </View>
-              <View style={styles.tagsPerimetros}>
-                {PERIMETROS_DEF.map(({ clave, etiqueta }) => (
-                  <Text key={clave} style={styles.tagPerimetro}>
-                    {etiqueta}: {item.perimetrosCm[clave]}cm
-                  </Text>
-                ))}
-              </View>
-            </View>
+            <ItemHistorialMedida key={item.mes} item={item} />
           ))}
         </ScrollView>
       </KeyboardAvoidingView>
@@ -188,16 +167,4 @@ const styles = StyleSheet.create({
   },
   textoBotonGuardar: { color: '#0F172A', fontSize: 16, fontWeight: 'bold' },
   tituloHistorial: { fontSize: 18, fontWeight: 'bold', color: COLORES_APP.texto, marginVertical: 12 },
-  itemHistorial: {
-    backgroundColor: COLORES_APP.superficie, borderRadius: 12, padding: 14,
-    marginBottom: 10, borderWidth: 1, borderColor: COLORES_APP.borde,
-  },
-  encabezadoHistorial: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
-  mesHistorial: { fontSize: 16, fontWeight: 'bold', color: COLORES_APP.texto },
-  pesoHistorial: { fontSize: 14, color: COLORES_APP.primario, fontWeight: '600' },
-  tagsPerimetros: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  tagPerimetro: {
-    backgroundColor: COLORES_APP.superficieClara, color: COLORES_APP.textoSecundario,
-    fontSize: 12, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4,
-  },
 });

@@ -5,21 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { ejercicios } from '@/data/ejercicios';
 import { useGym } from '@/context/GymContext';
+import { AlertaLesion } from '@/components/AlertaLesion';
 import { COLORES_APP } from '@/constants/colores';
 import type { GrupoMuscular } from '@/types/gym';
 
 const GRUPOS_VALIDOS: GrupoMuscular[] = [
-  'pierna',
-  'pecho',
-  'triceps',
-  'espalda',
-  'hombro',
-  'biceps',
-  'abdomen',
-  'cadera',
-  'gluteo',
-  'lumbar',
-  'antebrazo',
+  'pierna', 'pecho', 'triceps', 'espalda', 'hombro', 'biceps',
+  'abdomen', 'cadera', 'gluteo', 'lumbar', 'antebrazo',
 ];
 
 export default function GrupoMuscularScreen() {
@@ -43,8 +35,7 @@ export default function GrupoMuscularScreen() {
         </Text>
         <Pressable
           style={styles.botonVolver}
-          onPress={() => router.replace('/catalogo')}
-          accessibilityRole="button">
+          onPress={() => router.replace('/catalogo')}>
           <Text style={styles.textoBotonVolver}>Volver al Catálogo</Text>
         </Pressable>
       </SafeAreaView>
@@ -57,26 +48,13 @@ export default function GrupoMuscularScreen() {
   return (
     <SafeAreaView style={styles.safeArea} edges={['bottom']}>
       <Stack.Screen options={{ title: `Grupo: ${nombreGrupo}` }} />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.cabecera}>
           <Text style={styles.titulo}>{nombreGrupo}</Text>
           <Text style={styles.subtitulo}>{items.length} ejercicios disponibles</Text>
         </View>
 
-        {tieneLesion && (
-          <View style={styles.alertaLesion}>
-            <Ionicons name="warning" size={24} color={COLORES_APP.advertencia} />
-            <View style={styles.alertaInfo}>
-              <Text style={styles.alertaTitulo}>Advertencia de Restricción</Text>
-              <Text style={styles.alertaTexto}>
-                Tienes una lesión o afección registrada en este grupo muscular ({nombreGrupo}).
-                Consulta con tu entrenador o realiza los ejercicios con carga moderada.
-              </Text>
-            </View>
-          </View>
-        )}
+        {tieneLesion && <AlertaLesion grupo={grupo} />}
 
         <View style={styles.lista}>
           {items.map(item => (
@@ -98,11 +76,7 @@ export default function GrupoMuscularScreen() {
                 </Text>
               </View>
               <View style={styles.botonAccion}>
-                <Ionicons
-                  name="chevron-forward"
-                  size={20}
-                  color={COLORES_APP.textoSecundario}
-                />
+                <Ionicons name="chevron-forward" size={20} color={COLORES_APP.textoSecundario} />
               </View>
             </Pressable>
           ))}
@@ -115,56 +89,22 @@ export default function GrupoMuscularScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: COLORES_APP.fondo },
   scrollContent: { padding: 16, paddingBottom: 24 },
-  cabecera: { marginBottom: 16 },
-  titulo: { fontSize: 24, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 4 },
-  subtitulo: { fontSize: 15, color: COLORES_APP.textoSecundario },
-  alertaLesion: {
-    backgroundColor: COLORES_APP.advertenciaFondo,
-    borderColor: COLORES_APP.advertenciaBorde,
-    borderWidth: 1.5,
-    borderRadius: 12,
-    padding: 14,
-    marginBottom: 16,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
-  },
-  alertaInfo: { flex: 1 },
-  alertaTitulo: { fontSize: 15, fontWeight: 'bold', color: COLORES_APP.advertencia, marginBottom: 2 },
-  alertaTexto: { fontSize: 13, color: COLORES_APP.texto, lineHeight: 18 },
-  lista: { gap: 10 },
+  cabecera: { marginBottom: 12 },
+  titulo: { fontSize: 24, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 2 },
+  subtitulo: { fontSize: 14, color: COLORES_APP.textoSecundario },
+  lista: { gap: 10, marginTop: 4 },
   tarjetaEjercicio: {
-    backgroundColor: COLORES_APP.superficie,
-    borderRadius: 12,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORES_APP.borde,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    minHeight: 56,
+    backgroundColor: COLORES_APP.superficie, borderRadius: 12, padding: 14,
+    borderWidth: 1, borderColor: COLORES_APP.borde, flexDirection: 'row',
+    alignItems: 'center', justifyContent: 'space-between', minHeight: 54,
   },
   infoEjercicio: { flex: 1 },
-  nombreEjercicio: { fontSize: 16, fontWeight: '600', color: COLORES_APP.texto, marginBottom: 4 },
-  metaEjercicio: { fontSize: 14, color: COLORES_APP.textoSecundario },
+  nombreEjercicio: { fontSize: 16, fontWeight: '600', color: COLORES_APP.texto, marginBottom: 2 },
+  metaEjercicio: { fontSize: 13, color: COLORES_APP.textoSecundario },
   botonAccion: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
-  contenedorError: {
-    flex: 1,
-    backgroundColor: COLORES_APP.fondo,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
+  contenedorError: { flex: 1, backgroundColor: COLORES_APP.fondo, alignItems: 'center', justifyContent: 'center', padding: 24 },
   tituloError: { fontSize: 22, fontWeight: 'bold', color: COLORES_APP.texto, marginTop: 12 },
   textoError: { fontSize: 15, color: COLORES_APP.textoSecundario, textAlign: 'center', marginVertical: 10 },
-  botonVolver: {
-    marginTop: 16,
-    backgroundColor: COLORES_APP.primario,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    minHeight: 44,
-    justifyContent: 'center',
-  },
+  botonVolver: { marginTop: 16, backgroundColor: COLORES_APP.primario, paddingHorizontal: 20, paddingVertical: 12, borderRadius: 8, minHeight: 44, justifyContent: 'center' },
   textoBotonVolver: { color: '#0F172A', fontWeight: 'bold', fontSize: 15 },
 });
