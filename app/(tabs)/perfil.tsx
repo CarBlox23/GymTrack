@@ -12,24 +12,42 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useGym } from '@/context/GymContext';
+import { socioInicial } from '@/data/socio';
 import { CampoFormulario } from '@/components/CampoFormulario';
 import { COLORES_APP } from '@/constants/colores';
 
 export default function PerfilScreen() {
-  const { socio, setSocio } = useGym();
+  const { socio, setSocio, reiniciarDatos } = useGym();
 
   const [nombre, setNombre] = useState(socio.nombre);
   const [edadTexto, setEdadTexto] = useState(socio.edad.toString());
   const [objetivo, setObjetivo] = useState(socio.objetivo);
   const [errores, setErrores] = useState<{ nombre?: string; edad?: string }>({});
 
+  const confirmarReinicio = () => {
+    Alert.alert(
+      'Restaurar Datos de Prueba',
+      '¿Deseas restaurar el socio, las medidas y el progreso a los valores originales de la ficha?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Restaurar',
+          style: 'destructive',
+          onPress: async () => {
+            await reiniciarDatos();
+            setNombre(socioInicial.nombre);
+            setEdadTexto(socioInicial.edad.toString());
+            setObjetivo(socioInicial.objetivo);
+            Alert.alert('Restaurado', 'Datos restablecidos a los valores iniciales.');
+          },
+        },
+      ]
+    );
+  };
+
   const validarYGuardar = () => {
     const nuevosErrores: { nombre?: string; edad?: string } = {};
-
-    if (!nombre.trim()) {
-      nuevosErrores.nombre = 'El nombre no puede estar vacío.';
-    }
-
+    if (!nombre.trim()) nuevosErrores.nombre = 'El nombre no puede estar vacío.';
     const edadLimpia = edadTexto.trim();
     if (!edadLimpia) {
       nuevosErrores.edad = 'La edad es obligatoria.';
@@ -39,17 +57,14 @@ export default function PerfilScreen() {
         nuevosErrores.edad = 'La edad debe ser un número entero entre 14 y 90 años.';
       }
     }
-
     setErrores(nuevosErrores);
     if (Object.keys(nuevosErrores).length > 0) return;
-
     setSocio({
       ...socio,
       nombre: nombre.trim(),
       edad: parseInt(edadTexto.trim(), 10),
       objetivo: objetivo.trim(),
     });
-
     Alert.alert('Perfil Guardado', 'Los datos del socio han sido actualizados con éxito.');
   };
 
@@ -98,6 +113,14 @@ export default function PerfilScreen() {
               onPress={validarYGuardar}
               accessibilityRole="button">
               <Text style={styles.textoBoton}>Guardar Cambios</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.botonReinicio}
+              onPress={confirmarReinicio}
+              accessibilityRole="button">
+              <Ionicons name="refresh-outline" size={18} color={COLORES_APP.textoSecundario} />
+              <Text style={styles.textoBotonReinicio}>Restaurar Datos Iniciales</Text>
             </Pressable>
           </View>
 
@@ -154,6 +177,11 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center', marginTop: 6,
   },
   textoBoton: { color: '#0F172A', fontSize: 16, fontWeight: 'bold' },
+  botonReinicio: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: 6, minHeight: 44, marginTop: 8,
+  },
+  textoBotonReinicio: { color: COLORES_APP.textoSecundario, fontSize: 14, fontWeight: '500' },
   filaTitulo: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10 },
   tituloMedica: { fontSize: 15, fontWeight: 'bold', color: COLORES_APP.texto },
   itemObs: { flexDirection: 'row', alignItems: 'flex-start', gap: 6, marginBottom: 6 },
