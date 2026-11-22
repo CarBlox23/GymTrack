@@ -1,39 +1,201 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { useState, useMemo } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  ScrollView,
+  Pressable,
+  useWindowDimensions,
+  DimensionValue,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { ejercicios } from '@/data/ejercicios';
+import { normalizar } from '@/utils/texto';
 import { COLORES_APP } from '@/constants/colores';
+import type { GrupoMuscular } from '@/types/gym';
+
+const GRUPOS_MUSCULARES: { clave: GrupoMuscular; nombre: string; icono: keyof typeof Ionicons.glyphMap }[] = [
+  { clave: 'pierna', nombre: 'Pierna', icono: 'walk-outline' },
+  { clave: 'pecho', nombre: 'Pecho', icono: 'shield-outline' },
+  { clave: 'triceps', nombre: 'Tríceps', icono: 'barbell-outline' },
+  { clave: 'espalda', nombre: 'Espalda', icono: 'body-outline' },
+  { clave: 'hombro', nombre: 'Hombro', icono: 'fitness-outline' },
+  { clave: 'biceps', nombre: 'Bíceps', icono: 'hand-left-outline' },
+  { clave: 'abdomen', nombre: 'Abdomen', icono: 'disc-outline' },
+  { clave: 'cadera', nombre: 'Cadera', icono: 'radio-button-on-outline' },
+  { clave: 'gluteo', nombre: 'Glúteo', icono: 'flame-outline' },
+  { clave: 'lumbar', nombre: 'Lumbar', icono: 'pulse-outline' },
+  { clave: 'antebrazo', nombre: 'Antebrazo', icono: 'hand-right-outline' },
+];
 
 export default function CatalogoScreen() {
+  const router = useRouter();
+  const { width } = useWindowDimensions();
+  const [busqueda, setBusqueda] = useState('');
+
+  const numColumnas = width > 600 ? 3 : 2;
+  const anchoTarjeta = `${Math.floor(100 / numColumnas) - 2}%`;
+
+  const ejerciciosFiltrados = useMemo(() => {
+    if (!busqueda.trim()) return [];
+    const term = normalizar(busqueda);
+    return ejercicios.filter(e => normalizar(e.nombre).includes(term));
+  }, [busqueda]);
+
+  const conteoPorGrupo = useMemo(() => {
+    const conteo: Record<string, number> = {};
+    ejercicios.forEach(e => {
+      conteo[e.grupo] = (conteo[e.grupo] || 0) + 1;
+    });
+    return conteo;
+  }, []);
+
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <Text style={styles.titulo}>Catálogo de Ejercicios</Text>
-      <Link href="/grupo/pecho" style={styles.enlace}>
-        <Text style={styles.enlaceTexto}>Ver Pecho (Prueba)</Text>
-      </Link>
+    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+      <View style={styles.contenedor}>
+        <View style={styles.barraBusqueda}>
+          <Ionicons name="search" size={20} color={COLORES_APP.textoSecundario} style={styles.iconoBusqueda} />
+          <TextInput
+            style={styles.inputBusqueda}
+            placeholder="Buscar ejercicio (ej. extensión)..."
+            placeholderTextColor={COLORES_APP.textoSecundario}
+            value={busqueda}
+            onChangeText={setBusqueda}
+            autoCapitalize="none"
+            autoCorrect={false}
+          />
+          {busqueda.length > 0 && (
+            <Pressable
+              style={styles.botonLimpiar}
+              onPress={() => setBusqueda('')}
+              accessibilityRole="button"
+              accessibilityLabel="Limpiar búsqueda">
+              <Ionicons name="close-circle" size={20} color={COLORES_APP.textoSecundario} />
+            </Pressable>
+          )}
+        </View>
+
+        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {busqueda.trim().length > 0 ? (
+            <View>
+              <Text style={styles.tituloResultados}>
+                Resultados ({ejerciciosFiltrados.length})
+              </Text>
+              {ejerciciosFiltrados.length === 0 ? (
+                <View style={styles.sinResultados}>
+                  <Ionicons name="alert-circle-outline" size={48} color={COLORES_APP.textoSecundario} />
+                  <Text style={styles.sinResultadosTexto}>
+                    No se encontraron ejercicios con "{busqueda}"
+                  </Text>
+                </View>
+              ) : (
+                ejerciciosFiltrados.map(item => (
+                  <Pressable
+                    key={item.id}
+                    style={styles.itemResultado}
+                    onPress={() =>
+                      router.push({
+                        pathname: '/ejercicio/[id]',
+                        params: { id: item.id },
+                      })
+                    }>
+                    <View style={styles.infoResultado}>
+                      <Text style={styles.nombreResultado}>{item.nombre}</Text>
+                      <Text style={styles.grupoResultado}>
+                        {item.grupo} • {item.series} × {item.repeticiones}
+                      </Text>
+                    </View>
+                    <Ionicons name="chevron-forward" size={20} color={COLORES_APP.textoSecundario} />
+                  </Pressable>
+                ))
+              )}
+            </View>
+          ) : (
+            <View>
+              <Text style={styles.tituloSeccion}>Grupos Musculares (11)</Text>
+              <View style={styles.cuadricula}>
+                {GRUPOS_MUSCULARES.map(grupo => (
+                  <Pressable
+                    key={grupo.clave}
+                    style={[styles.tarjetaGrupo, { width: anchoTarjeta as DimensionValue }]}
+                    onPress={() => router.push(`/grupo/${grupo.clave}`)}>
+                    <View style={styles.iconoContenedor}>
+                      <Ionicons name={grupo.icono} size={26} color={COLORES_APP.primario} />
+                    </View>
+                    <Text style={styles.nombreGrupo}>{grupo.nombre}</Text>
+                    <Text style={styles.cantidadEjercicios}>
+                      {conteoPorGrupo[grupo.clave] || 0} ejercicios
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            </View>
+          )}
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORES_APP.fondo,
-    padding: 16,
-  },
-  titulo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: COLORES_APP.texto,
+  safeArea: { flex: 1, backgroundColor: COLORES_APP.fondo },
+  contenedor: { flex: 1, padding: 16 },
+  barraBusqueda: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORES_APP.superficie,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: COLORES_APP.borde,
+    paddingHorizontal: 12,
+    minHeight: 48,
     marginBottom: 16,
   },
-  enlace: {
-    padding: 12,
+  iconoBusqueda: { marginRight: 8 },
+  inputBusqueda: { flex: 1, color: COLORES_APP.texto, fontSize: 16, minHeight: 44 },
+  botonLimpiar: { minWidth: 44, minHeight: 44, alignItems: 'center', justifyContent: 'center' },
+  scrollContent: { paddingBottom: 24 },
+  tituloSeccion: { fontSize: 18, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 14 },
+  tituloResultados: { fontSize: 16, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 12 },
+  cuadricula: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 10 },
+  tarjetaGrupo: {
     backgroundColor: COLORES_APP.superficie,
-    borderRadius: 8,
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORES_APP.borde,
+    minHeight: 110,
+    justifyContent: 'center',
+  },
+  iconoContenedor: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORES_APP.superficieClara,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
   },
-  enlaceTexto: {
-    color: COLORES_APP.primario,
-    fontSize: 16,
+  nombreGrupo: { fontSize: 16, fontWeight: 'bold', color: COLORES_APP.texto, marginBottom: 2 },
+  cantidadEjercicios: { fontSize: 13, color: COLORES_APP.textoSecundario },
+  itemResultado: {
+    backgroundColor: COLORES_APP.superficie,
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: COLORES_APP.borde,
+    minHeight: 56,
   },
+  infoResultado: { flex: 1 },
+  nombreResultado: { fontSize: 16, fontWeight: '600', color: COLORES_APP.texto, marginBottom: 2 },
+  grupoResultado: { fontSize: 14, color: COLORES_APP.textoSecundario, textTransform: 'capitalize' },
+  sinResultados: { alignItems: 'center', paddingVertical: 40 },
+  sinResultadosTexto: { fontSize: 15, color: COLORES_APP.textoSecundario, textAlign: 'center', marginTop: 10 },
 });
